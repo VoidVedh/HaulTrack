@@ -1,0 +1,1619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HaulTrack - Fleet Telematics & Driver Safety Demo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #0a0e17;
+      --bg-secondary: #111827;
+      --bg-card: rgba(17, 24, 39, 0.75);
+      --bg-card-hover: rgba(30, 41, 59, 0.8);
+      --border-color: rgba(255, 255, 255, 0.08);
+      --border-focus: rgba(6, 182, 212, 0.5);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+      --cyan: #06b6d4;
+      --cyan-glow: rgba(6, 182, 212, 0.25);
+      --emerald: #10b981;
+      --emerald-glow: rgba(16, 185, 129, 0.2);
+      --amber: #f59e0b;
+      --rose: #f43f5e;
+      --purple: #8b5cf6;
+      --radius-lg: 16px;
+      --radius-md: 10px;
+      --radius-sm: 6px;
+      --shadow-card: 0 10px 30px -10px rgba(0, 0, 0, 0.5), 0 0 1px 1px rgba(255, 255, 255, 0.05);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-primary);
+      color: var(--text-main);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      line-height: 1.5;
+      background-image: 
+        radial-gradient(circle at 15% 10%, rgba(6, 182, 212, 0.08), transparent 40%),
+        radial-gradient(circle at 85% 90%, rgba(139, 92, 246, 0.08), transparent 40%),
+        linear-gradient(to bottom, #0a0e17, #0f172a);
+    }
+
+    /* Container */
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    /* Header */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--border-color);
+      margin-bottom: 28px;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .brand-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius-md);
+      background: linear-gradient(135deg, var(--cyan), var(--purple));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      box-shadow: 0 0 20px var(--cyan-glow);
+    }
+
+    .brand-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 26px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      background: linear-gradient(to right, #ffffff, #cbd5e1);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .brand-subtitle {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .meta-badge {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 10px 16px;
+      text-align: right;
+      font-size: 13px;
+    }
+
+    .meta-badge .student-name {
+      font-weight: 600;
+      color: var(--cyan);
+    }
+
+    .meta-badge .student-sub {
+      color: var(--text-dim);
+      font-size: 12px;
+    }
+
+    /* Tab Navigation */
+    .tabs-nav {
+      display: flex;
+      gap: 8px;
+      background: rgba(15, 23, 42, 0.6);
+      padding: 6px;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-color);
+      margin-bottom: 28px;
+      overflow-x: auto;
+    }
+
+    .tab-btn {
+      flex: 1;
+      min-width: 180px;
+      padding: 12px 18px;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-family: 'Outfit', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+
+    .tab-btn:hover {
+      color: var(--text-main);
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .tab-btn.active {
+      background: linear-gradient(135deg, rgba(6, 182, 212, 0.15), rgba(139, 92, 246, 0.15));
+      color: #38bdf8;
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Tab Content Areas */
+    .tab-panel {
+      display: none;
+      animation: fadeIn 0.25s ease-out;
+    }
+
+    .tab-panel.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Grid Layouts */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    @media (max-width: 960px) {
+      .grid-2 { grid-template-columns: 1fr; }
+    }
+
+    /* Cards */
+    .card {
+      background: var(--bg-card);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      box-shadow: var(--shadow-card);
+    }
+
+    .card-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* Form & Controls */
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    .form-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .form-label-val {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 600;
+      color: var(--cyan);
+    }
+
+    input[type="range"] {
+      width: 100%;
+      height: 6px;
+      border-radius: 3px;
+      background: #1e293b;
+      outline: none;
+      -webkit-appearance: none;
+      appearance: none;
+      cursor: pointer;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--cyan);
+      box-shadow: 0 0 10px var(--cyan-glow);
+      cursor: pointer;
+      transition: transform 0.1s ease;
+    }
+
+    input[type="range"]::-webkit-slider-thumb:hover {
+      transform: scale(1.15);
+    }
+
+    select, input[type="text"] {
+      width: 100%;
+      background: #0f172a;
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 10px 14px;
+      border-radius: var(--radius-md);
+      font-family: inherit;
+      font-size: 14px;
+      outline: none;
+      transition: border 0.2s ease;
+    }
+
+    select:focus, input[type="text"]:focus {
+      border-color: var(--cyan);
+      box-shadow: 0 0 0 2px var(--cyan-glow);
+    }
+
+    /* Buttons */
+    .btn {
+      padding: 10px 18px;
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      font-size: 14px;
+      font-family: 'Outfit', sans-serif;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: none;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--cyan), #0284c7);
+      color: white;
+      box-shadow: 0 4px 14px rgba(6, 182, 212, 0.3);
+    }
+
+    .btn-primary:hover {
+      opacity: 0.95;
+      transform: translateY(-1px);
+    }
+
+    .btn-outline {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+    }
+
+    .btn-outline:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-main);
+    }
+
+    .preset-pill {
+      font-size: 12px;
+      padding: 6px 12px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .preset-pill:hover {
+      background: rgba(6, 182, 212, 0.15);
+      border-color: var(--cyan);
+      color: var(--cyan);
+    }
+
+    /* Comparison Display */
+    .comparison-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .score-box {
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      text-align: center;
+      position: relative;
+      border: 1px solid var(--border-color);
+      overflow: hidden;
+    }
+
+    .score-box.new-box {
+      background: radial-gradient(circle at top, rgba(16, 185, 129, 0.12), rgba(15, 23, 42, 0.8));
+      border-color: rgba(16, 185, 129, 0.3);
+    }
+
+    .score-box.legacy-box {
+      background: radial-gradient(circle at top, rgba(244, 63, 94, 0.12), rgba(15, 23, 42, 0.8));
+      border-color: rgba(244, 63, 94, 0.3);
+    }
+
+    .score-box-title {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .score-box.new-box .score-box-title { color: var(--emerald); }
+    .score-box.legacy-box .score-box-title { color: var(--rose); }
+
+    .score-number {
+      font-family: 'Outfit', sans-serif;
+      font-size: 64px;
+      font-weight: 800;
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+
+    .score-box.new-box .score-number { color: var(--emerald); text-shadow: 0 0 25px var(--emerald-glow); }
+    .score-box.legacy-box .score-number { color: var(--rose); text-shadow: 0 0 25px rgba(244, 63, 94, 0.3); }
+
+    .score-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 14px;
+    }
+
+    .badge-success { background: rgba(16, 185, 129, 0.2); color: var(--emerald); border: 1px solid rgba(16, 185, 129, 0.4); }
+    .badge-danger { background: rgba(244, 63, 94, 0.2); color: var(--rose); border: 1px solid rgba(244, 63, 94, 0.4); }
+    .badge-warning { background: rgba(245, 158, 11, 0.2); color: var(--amber); border: 1px solid rgba(245, 158, 11, 0.4); }
+    .badge-info { background: rgba(6, 182, 212, 0.2); color: var(--cyan); border: 1px solid rgba(6, 182, 212, 0.4); }
+
+    .penalty-breakdown {
+      display: flex;
+      justify-content: space-around;
+      padding: 10px;
+      background: rgba(0, 0, 0, 0.25);
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      margin-top: 14px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .penalty-item {
+      text-align: center;
+    }
+
+    .penalty-val {
+      font-weight: 700;
+    }
+
+    .explanation-text {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 14px;
+      line-height: 1.4;
+      text-align: left;
+      padding: 10px 14px;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: var(--radius-sm);
+    }
+
+    /* Canvas / Map Simulator */
+    .canvas-container {
+      position: relative;
+      background: #090d16;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      margin-bottom: 16px;
+    }
+
+    #corridorCanvas {
+      width: 100%;
+      height: 240px;
+      display: block;
+    }
+
+    .canvas-legend {
+      display: flex;
+      gap: 16px;
+      padding: 10px 16px;
+      background: rgba(15, 23, 42, 0.8);
+      font-size: 12px;
+      color: var(--text-muted);
+      border-top: 1px solid var(--border-color);
+      flex-wrap: wrap;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+
+    /* Telemetry Log */
+    .telemetry-log {
+      max-height: 180px;
+      overflow-y: auto;
+      background: #090d16;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 12px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+    }
+
+    .log-entry {
+      padding: 4px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+      display: flex;
+      gap: 12px;
+    }
+
+    .log-ts { color: var(--text-dim); }
+    .log-status { font-weight: 600; }
+    .log-status.ALERT { color: var(--rose); }
+    .log-status.NOTICE { color: var(--amber); }
+    .log-status.ON_ROUTE { color: var(--emerald); }
+    .log-status.CLEARED { color: var(--cyan); }
+    .log-msg { color: var(--text-muted); }
+
+    /* Stat Cards */
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 18px;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+    }
+
+    .stat-number {
+      font-family: 'Outfit', sans-serif;
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--cyan);
+    }
+
+    .stat-desc {
+      font-size: 12px;
+      color: var(--text-dim);
+      margin-top: 4px;
+    }
+
+    /* Switch toggle */
+    .switch-group {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 0;
+    }
+
+    .toggle {
+      position: relative;
+      display: inline-block;
+      width: 44px;
+      height: 24px;
+    }
+
+    .toggle input { opacity: 0; width: 0; height: 0; }
+
+    .slider-toggle {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: #1e293b;
+      transition: .3s;
+      border-radius: 24px;
+      border: 1px solid var(--border-color);
+    }
+
+    .slider-toggle:before {
+      position: absolute;
+      content: "";
+      height: 16px;
+      width: 16px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .3s;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider-toggle {
+      background-color: var(--cyan);
+    }
+
+    input:checked + .slider-toggle:before {
+      transform: translateX(20px);
+    }
+
+    /* Footer */
+    footer {
+      margin-top: 48px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border-color);
+      text-align: center;
+      color: var(--text-dim);
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <!-- Header -->
+  <header>
+    <div class="brand">
+      <div class="brand-icon">🚛</div>
+      <div>
+        <div class="brand-title">HaulTrack Telematics</div>
+        <div class="brand-subtitle">Interactive Engineering Demo · Case Study No. 19 (1,800 Trucks)</div>
+      </div>
+    </div>
+    <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+      <a href="https://github.com/VoidVedh/HaulTrack" target="_blank" style="text-decoration: none; display: flex; align-items: center; gap: 8px; background: rgba(255, 255, 255, 0.06); border: 1px solid var(--border-color); color: var(--text-main); padding: 8px 14px; border-radius: var(--radius-md); font-size: 13px; font-weight: 500; transition: all 0.2s ease;">
+        <svg height="18" width="18" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path></svg>
+        GitHub Repo
+      </a>
+      <div class="meta-badge">
+        <div>Student: <span class="student-name">Vedh Naik</span> (Roll: 150096725163)</div>
+        <div class="student-sub">Cohort: Jensen Huang · B.Tech CSE (SEPM)</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Navigation Tabs -->
+  <div class="tabs-nav">
+    <button class="tab-btn active" onclick="switchTab('scoring')">🎯 Terrain Scorer</button>
+    <button class="tab-btn" onclick="switchTab('deviation')">🗺️ Route Deviation</button>
+    <button class="tab-btn" onclick="switchTab('policy')">⚖️ Policy & Access</button>
+    <button class="tab-btn" onclick="switchTab('overview')">📊 Fleet Architecture</button>
+    <button class="tab-btn" onclick="switchTab('deliverables')">📑 SEPM Deliverables</button>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- TAB 1: TERRAIN SCORING (HAULTRACK VS LEGACY) -->
+  <!-- ===================================================================== -->
+  <div id="tab-scoring" class="tab-panel active">
+    <!-- Presets bar -->
+    <div style="margin-bottom: 20px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+      <span style="font-size: 13px; font-weight: 600; color: var(--text-muted); margin-right: 6px;">Test Cases:</span>
+      <button class="preset-pill" onclick="applyPreset('ST-01')">ST-01: Flat Road (Clean)</button>
+      <button class="preset-pill" onclick="applyPreset('ST-04')">ST-04: Moderate Descent (3%)</button>
+      <button class="preset-pill" onclick="applyPreset('ST-05')">ST-05: Steep Hill (6%)</button>
+      <button class="preset-pill" onclick="applyPreset('ST-06')">ST-06: Ghat Descent (9%) [Vendor Fail]</button>
+      <button class="preset-pill" onclick="applyPreset('ST-07')">ST-07: Genuine Harsh (4.6 m/s²)</button>
+      <button class="preset-pill" onclick="applyPreset('ST-12')">ST-12: &lt; 500 km (Unrated)</button>
+      <button class="preset-pill" onclick="applyPreset('ST-13')">ST-13: 8% Missing Grade (Withheld)</button>
+    </div>
+
+    <div class="grid-2">
+      <!-- Input Controls -->
+      <div class="card">
+        <div class="card-title">⚙️ Telematics Trip Parameters</div>
+
+        <div class="form-group">
+          <div class="form-label">
+            <span>Downhill Gradient Band</span>
+            <span class="form-label-val" id="lblGrade">9.0% (Ghat Descent)</span>
+          </div>
+          <select id="selGradeBand" onchange="updateScoring()">
+            <option value="-4">Ascent / Uphill (&le; 0%) — Threshold 3.0 m/s²</option>
+            <option value="1">Mild Downhill (0 - &lt;2%) — Threshold 3.0 m/s²</option>
+            <option value="3.5">Moderate Downhill (2 - &lt;5%) — Threshold 3.3 m/s²</option>
+            <option value="6.5">Steep Downhill (5 - &lt;8%) — Threshold 3.6 m/s²</option>
+            <option value="9.0" selected>Ghat / Mountain Descent (&ge; 8%) — Threshold 4.0 m/s²</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <div class="form-label">
+            <span>Braking Deceleration (Net Decel)</span>
+            <span class="form-label-val" id="lblDecel">3.5 m/s²</span>
+          </div>
+          <input type="range" id="rngDecel" min="2.0" max="5.0" step="0.1" value="3.5" oninput="updateScoring()">
+        </div>
+
+        <div class="form-group">
+          <div class="form-label">
+            <span>Braking Event Count</span>
+            <span class="form-label-val" id="lblEventCount">11 events</span>
+          </div>
+          <input type="range" id="rngEvents" min="0" max="20" step="1" value="11" oninput="updateScoring()">
+        </div>
+
+        <div class="form-group">
+          <div class="form-label">
+            <span>Trip / Window Distance</span>
+            <span class="form-label-val" id="lblDistance">60 km</span>
+          </div>
+          <input type="range" id="rngDistance" min="20" max="800" step="10" value="60" oninput="updateScoring()">
+        </div>
+
+        <div class="grid-2" style="gap: 12px;">
+          <div class="form-group">
+            <div class="form-label">
+              <span>Speeding % (q)</span>
+              <span class="form-label-val" id="lblSpeed">0%</span>
+            </div>
+            <input type="range" id="rngSpeed" min="0" max="15" step="1" value="0" oninput="updateScoring()">
+          </div>
+          <div class="form-group">
+            <div class="form-label">
+              <span>Idling % (z)</span>
+              <span class="form-label-val" id="lblIdle">0%</span>
+            </div>
+            <input type="range" id="rngIdle" min="0" max="15" step="1" value="0" oninput="updateScoring()">
+          </div>
+        </div>
+
+        <div class="switch-group">
+          <span style="font-size: 13px; color: var(--text-muted);">Enforce 28-Day Window (Min 500 km)</span>
+          <label class="toggle">
+            <input type="checkbox" id="chkWindow" onchange="updateScoring()">
+            <span class="slider-toggle"></span>
+          </label>
+        </div>
+
+        <div class="form-group" style="margin-top: 8px;">
+          <div class="form-label">
+            <span>Unknown Gradient Distance</span>
+            <span class="form-label-val" id="lblUnknownGrade">0% (limit: 5%)</span>
+          </div>
+          <input type="range" id="rngUnknown" min="0" max="15" step="1" value="0" oninput="updateScoring()">
+        </div>
+      </div>
+
+      <!-- Live Comparison Display -->
+      <div class="card">
+        <div class="card-title">⚖️ Safety Score Comparison</div>
+        
+        <div class="comparison-container">
+          <!-- HaulTrack New Scorer -->
+          <div class="score-box new-box">
+            <div class="score-box-title">HaulTrack (New)</div>
+            <div class="score-number" id="valNewScore">100.0</div>
+            <span class="score-badge badge-success" id="badgeNewStatus">RATED · FAIR</span>
+            <div style="font-size: 12px; color: var(--text-dim);">
+              Active Threshold: <strong style="color: var(--cyan);" id="lblActiveThresh">4.0 m/s²</strong><br>
+              Counted Harsh Brakes: <strong id="lblNewCounted">0</strong>
+            </div>
+            <div class="penalty-breakdown">
+              <div class="penalty-item"><div>Braking</div><div class="penalty-val" id="penNewB">0.0</div></div>
+              <div class="penalty-item"><div>Speed</div><div class="penalty-val" id="penNewS">0.0</div></div>
+              <div class="penalty-item"><div>Idle</div><div class="penalty-val" id="penNewI">0.0</div></div>
+            </div>
+            <div class="explanation-text" id="expNewText">
+              Safe downhill descent recognized! Braking at 3.5 m/s² on a 9% gradient is within the safe 4.0 m/s² limit. Zero unfair penalty.
+            </div>
+          </div>
+
+          <!-- Legacy Vendor Scorer -->
+          <div class="score-box legacy-box">
+            <div class="score-box-title">Legacy Vendor (Abandoned)</div>
+            <div class="score-number" id="valLegacyScore">50.0</div>
+            <span class="score-badge badge-danger" id="badgeLegacyStatus">PENALIZED (-50 pts)</span>
+            <div style="font-size: 12px; color: var(--text-dim);">
+              Fixed Flat Threshold: <strong style="color: var(--rose);">3.0 m/s²</strong><br>
+              Counted Harsh Brakes: <strong id="lblLegacyCounted">11</strong>
+            </div>
+            <div class="penalty-breakdown">
+              <div class="penalty-item"><div>Braking</div><div class="penalty-val" id="penLegB">50.0</div></div>
+              <div class="penalty-item"><div>Speed</div><div class="penalty-val" id="penLegS">0.0</div></div>
+              <div class="penalty-item"><div>Idle</div><div class="penalty-val" id="penLegI">0.0</div></div>
+            </div>
+            <div class="explanation-text" id="expLegText">
+              Requirements Failure: Flat 3.0 m/s² threshold penalizes unavoidable descent control, slashing driver score from 100 to 50!
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top: 18px; padding: 12px 16px; background: rgba(6, 182, 212, 0.08); border: 1px solid rgba(6, 182, 212, 0.2); border-radius: var(--radius-md); font-size: 13px; color: var(--text-muted);">
+          💡 <strong>Key Technical Insight:</strong> Score = 100 &minus; (B + S + I). Downhill gradient thresholds: &lt;2% = 3.0, 2–&lt;5% = 3.3, 5–&lt;8% = 3.6, &ge;8% = 4.0 m/s².
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- TAB 2: ROUTE DEVIATION SIMULATOR -->
+  <!-- ===================================================================== -->
+  <div id="tab-deviation" class="tab-panel">
+    <div class="grid-2">
+      <!-- Simulator Canvas & Controls -->
+      <div class="card">
+        <div class="card-title">🗺️ Telematics Route Corridor Simulator</div>
+
+        <div class="canvas-container">
+          <canvas id="corridorCanvas" width="560" height="240"></canvas>
+          <div class="canvas-legend">
+            <div class="legend-item"><div class="legend-dot" style="background: #38bdf8;"></div> Planned Route Line</div>
+            <div class="legend-item"><div class="legend-dot" style="background: rgba(16, 185, 129, 0.4);"></div> 500m Safe Corridor</div>
+            <div class="legend-item"><div class="legend-dot" style="background: #f43f5e;"></div> Truck Position</div>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 10px; margin-bottom: 16px;">
+          <button class="btn btn-primary" onclick="simulateStep()">⏱️ Simulate Next Tick (30s)</button>
+          <button class="btn btn-outline" onclick="resetDeviationSim()">🔄 Reset to Center</button>
+        </div>
+
+        <div class="form-group">
+          <div class="form-label">
+            <span>Truck Distance from Corridor Center</span>
+            <span class="form-label-val" id="lblSimDist">0 m (Inside Corridor)</span>
+          </div>
+          <input type="range" id="rngSimDist" min="0" max="2500" step="25" value="0" oninput="onSimSliderChange()">
+        </div>
+
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+          <button class="preset-pill" onclick="setSimDistance(120)">Jitter (120m)</button>
+          <button class="preset-pill" onclick="setSimDistance(500)">Boundary (500m)</button>
+          <button class="preset-pill" onclick="setSimDistance(650)">Off Route (650m)</button>
+          <button class="preset-pill" onclick="setSimDistance(2100)">Escalation (2,100m)</button>
+        </div>
+      </div>
+
+      <!-- State Machine & Exemption Context -->
+      <div class="card">
+        <div class="card-title">🚨 State Machine & Exemption Rules</div>
+
+        <div class="stat-grid" style="grid-template-columns: 1fr 1fr; margin-bottom: 16px;">
+          <div class="stat-card">
+            <div class="stat-label">Current Status</div>
+            <div class="stat-number" id="lblSimStatus" style="font-size: 26px; color: var(--emerald);">ON_ROUTE</div>
+            <div class="stat-desc" id="lblSimStatusDesc">Truck within 500m safe buffer</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Consecutive Off-Corridor</div>
+            <div class="stat-number" id="lblSimCount" style="font-size: 26px; color: var(--cyan);">0 / 3</div>
+            <div class="stat-desc">3 valid ticks (90s) &rarr; NOTICE</div>
+          </div>
+        </div>
+
+        <div style="font-size: 13px; font-weight: 600; color: var(--text-muted); margin-bottom: 8px;">
+          Contextual Suppressions (Exemptions):
+        </div>
+
+        <div class="grid-2" style="gap: 8px; margin-bottom: 16px;">
+          <div class="switch-group">
+            <span style="font-size: 13px; color: var(--text-muted);">Depot Geofence</span>
+            <label class="toggle">
+              <input type="checkbox" id="chkDepot" onchange="updateSimState()">
+              <span class="slider-toggle"></span>
+            </label>
+          </div>
+          <div class="switch-group">
+            <span style="font-size: 13px; color: var(--text-muted);">Planned Stop</span>
+            <label class="toggle">
+              <input type="checkbox" id="chkStop" onchange="updateSimState()">
+              <span class="slider-toggle"></span>
+            </label>
+          </div>
+          <div class="switch-group">
+            <span style="font-size: 13px; color: var(--text-muted);">Active Road Closure</span>
+            <label class="toggle">
+              <input type="checkbox" id="chkRoadClosure" onchange="updateSimState()">
+              <span class="slider-toggle"></span>
+            </label>
+          </div>
+          <div class="switch-group">
+            <span style="font-size: 13px; color: var(--text-muted);">Dispatcher Reroute</span>
+            <label class="toggle">
+              <input type="checkbox" id="chkReroute" onchange="updateSimState()">
+              <span class="slider-toggle"></span>
+            </label>
+          </div>
+          <div class="switch-group">
+            <span style="font-size: 13px; color: var(--text-muted);">Invalid GPS (HDOP &gt; 5)</span>
+            <label class="toggle">
+              <input type="checkbox" id="chkHdop" onchange="updateSimState()">
+              <span class="slider-toggle"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="telemetry-log" id="simLog">
+          <div class="log-entry">
+            <span class="log-ts">12:00:00</span>
+            <span class="log-status ON_ROUTE">ON_ROUTE</span>
+            <span class="log-msg">Truck #1042 initialized within planned corridor (0m).</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- TAB 3: POLICY & ACCESS CONTROL -->
+  <!-- ===================================================================== -->
+  <div id="tab-policy" class="tab-panel">
+    <div class="grid-2">
+      <!-- Authorization Request Panel -->
+      <div class="card">
+        <div class="card-title">🔐 Access Policy Evaluation Engine</div>
+        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">
+          Enforces the negotiated Data Use Policy agreed between Drivers' Union, Fleet Management, and Insurer.
+        </p>
+
+        <div class="form-group">
+          <label class="form-label">Requesting Role</label>
+          <select id="selRole" onchange="onRoleChanged()">
+            <option value="driver">Driver (Union Member)</option>
+            <option value="team_manager">Team Manager</option>
+            <option value="fleet_manager" selected>Fleet Manager</option>
+            <option value="insurer">Insurer (Underwriting Partner)</option>
+            <option value="hr_panel">HR Disciplinary Panel</option>
+            <option value="dispatcher">Dispatcher</option>
+            <option value="auditor">Safety Auditor</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Data Tier & Intended Action</label>
+          <select id="selAction" onchange="evaluatePolicy()">
+            <option value="disciplinary_export">Export Safety Scores as Disciplinary List</option>
+            <option value="safety_coaching">Advisory Coaching & Performance Review</option>
+            <option value="individual_insurer">Request Telemetry by Driver Identifier</option>
+            <option value="aggregate_insurer">Request Quarterly Harsh-Braking Fleet Aggregates</option>
+            <option value="driver_self_view">Driver Opens Personal Score & Event Breakdown</option>
+            <option value="hr_evidence">Use Driver Score as Evidence in Termination Hearing</option>
+            <option value="appeal_export">Export Driver Score Under Active Formal Appeal</option>
+          </select>
+        </div>
+
+        <button class="btn btn-primary" onclick="evaluatePolicy()" style="width: 100%; justify-content: center; margin-top: 8px;">
+          🛡️ Evaluate Authorization
+        </button>
+
+        <div style="margin-top: 20px;">
+          <div style="font-size: 13px; font-weight: 600; color: var(--text-muted); margin-bottom: 8px;">Quick Scenarios:</div>
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <button class="preset-pill" style="text-align: left;" onclick="setPolicyScenario('fleet_manager', 'disciplinary_export')">PE-01: Manager tries disciplinary export &rarr; DENIED & LOGGED</button>
+            <button class="preset-pill" style="text-align: left;" onclick="setPolicyScenario('insurer', 'individual_insurer')">PE-02: Insurer requests driver ID data &rarr; REJECTED</button>
+            <button class="preset-pill" style="text-align: left;" onclick="setPolicyScenario('driver', 'driver_self_view')">PE-05: Driver self-view with full breakdown &rarr; ALLOWED</button>
+            <button class="preset-pill" style="text-align: left;" onclick="setPolicyScenario('hr_panel', 'hr_evidence')">PE-06: HR Panel attempts to use score as evidence &rarr; BARRED</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Decision Result & Audit Trail -->
+      <div class="card">
+        <div class="card-title">📜 Authorization Verdict & Audit Log</div>
+
+        <div id="policyVerdictCard" style="padding: 18px; border-radius: var(--radius-md); border: 1px solid var(--border-color); background: rgba(0,0,0,0.25); margin-bottom: 20px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <span style="font-size: 12px; color: var(--text-dim); text-transform: uppercase; font-weight: 700;">Policy Decision</span>
+            <span class="score-badge badge-danger" id="policyStatusBadge">DENIED</span>
+          </div>
+          <div id="policyVerdictTitle" style="font-family: 'Outfit', sans-serif; font-size: 18px; font-weight: 700; color: var(--rose); margin-bottom: 6px;">
+            Disciplinary Export Strictly Prohibited
+          </div>
+          <div id="policyVerdictDesc" style="font-size: 13px; color: var(--text-muted); line-height: 1.4;">
+            Under the HaulTrack Data Use Policy agreed with the union, driver safety scores are advisory coaching instruments and can NEVER serve as the basis for disciplinary action or termination.
+          </div>
+        </div>
+
+        <div style="font-size: 13px; font-weight: 600; color: var(--text-muted); margin-bottom: 8px;">
+          Append-Only Tamper-Evident Audit Log:
+        </div>
+
+        <div class="telemetry-log" id="policyAuditLog" style="max-height: 220px;">
+          <div class="log-entry">
+            <span class="log-ts">12:00:00</span>
+            <span class="log-status" style="color: var(--rose);">DENIED</span>
+            <span class="log-msg">Actor 'fleet_mgr_sharma' attempt EXPORT_DISCIPLINARY blocked.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- TAB 4: FLEET ARCHITECTURE & RETENTION -->
+  <!-- ===================================================================== -->
+  <div id="tab-overview" class="tab-panel">
+    <!-- Fleet Numbers Grid -->
+    <div class="stat-grid">
+      <div class="stat-card">
+        <div class="stat-label">Active Trucks</div>
+        <div class="stat-number">1,800</div>
+        <div class="stat-desc">Commercial Heavy Vehicles</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Daily Telemetry Ingestion</div>
+        <div class="stat-number">5,184,000</div>
+        <div class="stat-desc">Records / day (60 records / sec)</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Telemetry Frequency</div>
+        <div class="stat-number">30 s</div>
+        <div class="stat-desc">Per-truck reporting tick</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">COCOMO Effort</div>
+        <div class="stat-number">239 PM</div>
+        <div class="stat-desc">17 months (44 KLOC semi-detached)</div>
+      </div>
+    </div>
+
+    <!-- Retention Lifecycle -->
+    <div class="card">
+      <div class="card-title">⏳ Automated Data Retention Lifecycle (PE-04)</div>
+      <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">
+        Balance insurer evidence requirements with driver privacy preservation using automated tier transitions:
+      </p>
+
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
+        <div style="padding: 16px; border-radius: var(--radius-md); background: rgba(6, 182, 212, 0.05); border: 1px solid rgba(6, 182, 212, 0.2);">
+          <div style="font-size: 13px; font-weight: 700; color: var(--cyan); margin-bottom: 4px;">Tier 1: Raw Telemetry</div>
+          <div style="font-size: 24px; font-weight: 800; color: var(--text-main); margin-bottom: 6px;">90 Days</div>
+          <div style="font-size: 12px; color: var(--text-muted); line-height: 1.4;">
+            High-frequency 30s records (GPS coordinates, speed, acceleration) purged permanently after 90 days.
+          </div>
+        </div>
+
+        <div style="padding: 16px; border-radius: var(--radius-md); background: rgba(139, 92, 246, 0.05); border: 1px solid rgba(139, 92, 246, 0.2);">
+          <div style="font-size: 13px; font-weight: 700; color: var(--purple); margin-bottom: 4px;">Tier 2: Identified Events</div>
+          <div style="font-size: 24px; font-weight: 800; color: var(--text-main); margin-bottom: 6px;">13 Months</div>
+          <div style="font-size: 12px; color: var(--text-muted); line-height: 1.4;">
+            Driver-linked event records irreversibly pseudonymized (driver ID stripped) after 13 months.
+          </div>
+        </div>
+
+        <div style="padding: 16px; border-radius: var(--radius-md); background: rgba(16, 185, 129, 0.05); border: 1px solid rgba(16, 185, 129, 0.2);">
+          <div style="font-size: 13px; font-weight: 700; color: var(--emerald); margin-bottom: 4px;">Tier 3: Pseudonymised Aggregates</div>
+          <div style="font-size: 24px; font-weight: 800; color: var(--text-main); margin-bottom: 6px;">36 Months</div>
+          <div style="font-size: 12px; color: var(--text-muted); line-height: 1.4;">
+            Fleet-level quarterly harsh-braking aggregates retained for 3 years to prove risk reduction to insurer.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- TAB 5: SEPM DELIVERABLES (PDFs) -->
+  <!-- ===================================================================== -->
+  <div id="tab-deliverables" class="tab-panel">
+    <div class="card" style="margin-bottom: 24px;">
+      <div class="card-title">📚 Official Course Deliverables & Academic Documentation</div>
+      <p style="font-size: 14px; color: var(--text-muted); line-height: 1.6; margin-bottom: 20px;">
+        Complete set of SEPM (Software Engineering & Project Management) engineering documentation for Case Study No. 19 (HaulTrack). All deliverables are tracked and available in the GitHub repository.
+      </p>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 18px;">
+        <!-- Deliverable 1 -->
+        <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 20px; display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
+              <span class="score-badge badge-info">Deliverable #1 · 16 KB</span>
+              <span style="font-size: 12px; color: var(--text-dim);">PDF</span>
+            </div>
+            <h3 style="font-size: 16px; font-weight: 700; color: var(--text-main); margin-bottom: 8px;">Stakeholder Conflict Analysis</h3>
+            <p style="font-size: 13px; color: var(--text-muted); line-height: 1.5; margin-bottom: 16px;">
+              Stakeholder register across Fleet Manager, Union, and Insurer; gate & weighted scoring prioritization; 6 resolution decisions; and measurable terrain requirements TN-1 through TN-7.
+            </p>
+          </div>
+          <div style="display: flex; gap: 10px;">
+            <a href="01_Stakeholder_Conflict_Analysis_HaulTrack.pdf" target="_blank" style="flex: 1; text-align: center; background: var(--cyan); color: #0a0e17; font-weight: 600; font-size: 13px; padding: 10px 14px; border-radius: var(--radius-sm); text-decoration: none; transition: 0.2s;">View Document</a>
+            <a href="01_Stakeholder_Conflict_Analysis_HaulTrack.pdf" download style="background: rgba(255, 255, 255, 0.08); color: var(--text-main); font-size: 13px; padding: 10px 14px; border-radius: var(--radius-sm); text-decoration: none; border: 1px solid var(--border-color);">⬇️</a>
+          </div>
+        </div>
+
+        <!-- Deliverable 2 -->
+        <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 20px; display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
+              <span class="score-badge badge-info">Deliverable #2 · 8 KB</span>
+              <span style="font-size: 12px; color: var(--text-dim);">PDF</span>
+            </div>
+            <h3 style="font-size: 16px; font-weight: 700; color: var(--text-main); margin-bottom: 8px;">Estimation Report</h3>
+            <p style="font-size: 13px; color: var(--text-muted); line-height: 1.5; margin-bottom: 16px;">
+              Intermediate COCOMO sizing for 44 KLOC semi-detached system (239.0 PM, 17.0 calendar months, 14 FTE average) with detailed justification for all 15 cost drivers (EAF = 1.15).
+            </p>
+          </div>
+          <div style="display: flex; gap: 10px;">
+            <a href="02_Estimation_Report_HaulTrack.pdf" target="_blank" style="flex: 1; text-align: center; background: var(--cyan); color: #0a0e17; font-weight: 600; font-size: 13px; padding: 10px 14px; border-radius: var(--radius-sm); text-decoration: none; transition: 0.2s;">View Document</a>
+            <a href="02_Estimation_Report_HaulTrack.pdf" download style="background: rgba(255, 255, 255, 0.08); color: var(--text-main); font-size: 13px; padding: 10px 14px; border-radius: var(--radius-sm); text-decoration: none; border: 1px solid var(--border-color);">⬇️</a>
+          </div>
+        </div>
+
+        <!-- Deliverable 3 -->
+        <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 20px; display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
+              <span class="score-badge badge-info">Deliverable #3 · 895 KB</span>
+              <span style="font-size: 12px; color: var(--text-dim);">PDF</span>
+            </div>
+            <h3 style="font-size: 16px; font-weight: 700; color: var(--text-main); margin-bottom: 8px;">Design Pack</h3>
+            <p style="font-size: 13px; color: var(--text-muted); line-height: 1.5; margin-bottom: 16px;">
+              Ingestion throughput architecture (5.18M records/day), pipeline sequence diagram, domain class diagram, terrain normalization math, and route deviation state machine.
+            </p>
+          </div>
+          <div style="display: flex; gap: 10px;">
+            <a href="03_Design_Pack_HaulTrack.pdf" target="_blank" style="flex: 1; text-align: center; background: var(--cyan); color: #0a0e17; font-weight: 600; font-size: 13px; padding: 10px 14px; border-radius: var(--radius-sm); text-decoration: none; transition: 0.2s;">View Document</a>
+            <a href="03_Design_Pack_HaulTrack.pdf" download style="background: rgba(255, 255, 255, 0.08); color: var(--text-main); font-size: 13px; padding: 10px 14px; border-radius: var(--radius-sm); text-decoration: none; border: 1px solid var(--border-color);">⬇️</a>
+          </div>
+        </div>
+
+        <!-- Deliverable 4 -->
+        <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 20px; display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
+              <span class="score-badge badge-info">Deliverable #4 · 13 KB</span>
+              <span style="font-size: 12px; color: var(--text-dim);">PDF</span>
+            </div>
+            <h3 style="font-size: 16px; font-weight: 700; color: var(--text-main); margin-bottom: 8px;">Test Design</h3>
+            <p style="font-size: 13px; color: var(--text-muted); line-height: 1.5; margin-bottom: 16px;">
+              IEEE 829 test specifications for terrain scoring (ST-01..17), route deviation tracking (RD-01..16), hill route regression (HR-01..05), and data policy enforcement (PE-01..06).
+            </p>
+          </div>
+          <div style="display: flex; gap: 10px;">
+            <a href="04_Test_Design_HaulTrack.pdf" target="_blank" style="flex: 1; text-align: center; background: var(--cyan); color: #0a0e17; font-weight: 600; font-size: 13px; padding: 10px 14px; border-radius: var(--radius-sm); text-decoration: none; transition: 0.2s;">View Document</a>
+            <a href="04_Test_Design_HaulTrack.pdf" download style="background: rgba(255, 255, 255, 0.08); color: var(--text-main); font-size: 13px; padding: 10px 14px; border-radius: var(--radius-sm); text-decoration: none; border: 1px solid var(--border-color);">⬇️</a>
+          </div>
+        </div>
+
+        <!-- Deliverable 5 -->
+        <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 20px; display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
+              <span class="score-badge badge-info">Deliverable #5 · 388 KB</span>
+              <span style="font-size: 12px; color: var(--text-dim);">PDF</span>
+            </div>
+            <h3 style="font-size: 16px; font-weight: 700; color: var(--text-main); margin-bottom: 8px;">Project Plan</h3>
+            <p style="font-size: 13px; color: var(--text-muted); line-height: 1.5; margin-bottom: 16px;">
+              Complete Work Breakdown Structure (WBS), 74-week Gantt chart, communication plan across stakeholder groups, risk matrix, and union concern mitigation strategy.
+            </p>
+          </div>
+          <div style="display: flex; gap: 10px;">
+            <a href="05_Project_Plan_HaulTrack.pdf" target="_blank" style="flex: 1; text-align: center; background: var(--cyan); color: #0a0e17; font-weight: 600; font-size: 13px; padding: 10px 14px; border-radius: var(--radius-sm); text-decoration: none; transition: 0.2s;">View Document</a>
+            <a href="05_Project_Plan_HaulTrack.pdf" download style="background: rgba(255, 255, 255, 0.08); color: var(--text-main); font-size: 13px; padding: 10px 14px; border-radius: var(--radius-sm); text-decoration: none; border: 1px solid var(--border-color);">⬇️</a>
+          </div>
+        </div>
+
+        <!-- Deliverable 6 -->
+        <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 20px; display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
+              <span class="score-badge badge-info">Deliverable #6 · 11 KB</span>
+              <span style="font-size: 12px; color: var(--text-dim);">PDF</span>
+            </div>
+            <h3 style="font-size: 16px; font-weight: 700; color: var(--text-main); margin-bottom: 8px;">Data Use Policy</h3>
+            <p style="font-size: 13px; color: var(--text-muted); line-height: 1.5; margin-bottom: 16px;">
+              Comprehensive data governance policy detailing 3-tier retention lifecycle, permitted coaching use, strict prohibitions on disciplinary dismissal, appeals process, and union oversight.
+            </p>
+          </div>
+          <div style="display: flex; gap: 10px;">
+            <a href="06_Data_Use_Policy_HaulTrack.pdf" target="_blank" style="flex: 1; text-align: center; background: var(--cyan); color: #0a0e17; font-weight: 600; font-size: 13px; padding: 10px 14px; border-radius: var(--radius-sm); text-decoration: none; transition: 0.2s;">View Document</a>
+            <a href="06_Data_Use_Policy_HaulTrack.pdf" download style="background: rgba(255, 255, 255, 0.08); color: var(--text-main); font-size: 13px; padding: 10px 14px; border-radius: var(--radius-sm); text-decoration: none; border: 1px solid var(--border-color);">⬇️</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <div>HaulTrack Fleet Telematics Demo · Developed for SEPM Case Study No. 19</div>
+    <div style="margin-top: 4px;">Student: <strong>Vedh Naik</strong> · Roll No: <strong>150096725163</strong> · Cohort: <strong>Jensen Huang</strong></div>
+  </footer>
+</div>
+
+<script>
+  // -------------------------------------------------------------------------
+  // Tab Switching Logic
+  // -------------------------------------------------------------------------
+  function switchTab(tabId) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+
+    const btn = Array.from(document.querySelectorAll('.tab-btn')).find(b => b.getAttribute('onclick').includes(tabId));
+    if (btn) btn.classList.add('active');
+
+    const panel = document.getElementById('tab-' + tabId);
+    if (panel) panel.classList.add('active');
+
+    if (tabId === 'deviation') {
+      drawCanvas();
+    }
+  }
+
+  // -------------------------------------------------------------------------
+  // Tab 1: Terrain Scoring Logic
+  // -------------------------------------------------------------------------
+  function updateScoring() {
+    const grade = parseFloat(document.getElementById('selGradeBand').value);
+    const decel = parseFloat(document.getElementById('rngDecel').value);
+    const events = parseInt(document.getElementById('rngEvents').value);
+    const distance = parseFloat(document.getElementById('rngDistance').value);
+    const speed = parseFloat(document.getElementById('rngSpeed').value);
+    const idle = parseFloat(document.getElementById('rngIdle').value);
+    const unknown = parseFloat(document.getElementById('rngUnknown').value);
+    const isWindow = document.getElementById('chkWindow').checked;
+
+    // Update labels
+    document.getElementById('lblDecel').innerText = decel.toFixed(1) + ' m/s²';
+    document.getElementById('lblEventCount').innerText = events + (events === 1 ? ' event' : ' events');
+    document.getElementById('lblDistance').innerText = distance + ' km';
+    document.getElementById('lblSpeed').innerText = speed + '%';
+    document.getElementById('lblIdle').innerText = idle + '%';
+    document.getElementById('lblUnknownGrade').innerText = unknown + '% (limit: 5%)';
+
+    // Downhill band label
+    let gradeLabel = 'Ascent / Flat (<= 0%)';
+    let newThresh = 3.0;
+    if (grade >= 8.0) {
+      gradeLabel = 'Ghat Descent (>= 8%)';
+      newThresh = 4.0;
+    } else if (grade >= 5.0) {
+      gradeLabel = 'Steep Downhill [5, 8%)';
+      newThresh = 3.6;
+    } else if (grade >= 2.0) {
+      gradeLabel = 'Moderate Downhill [2, 5%)';
+      newThresh = 3.3;
+    } else if (grade > 0.0) {
+      gradeLabel = 'Mild Downhill [0, 2%)';
+      newThresh = 3.0;
+    }
+    document.getElementById('lblGrade').innerText = gradeLabel;
+    document.getElementById('lblActiveThresh').innerText = newThresh.toFixed(1) + ' m/s²';
+
+    // Status checks
+    let status = 'RATED';
+    let statusReason = '';
+
+    if (unknown > 5.0) {
+      status = 'WITHHELD';
+      statusReason = 'Unknown gradient ' + unknown + '% exceeds 5% tolerance. Driver not penalized.';
+    } else if (isWindow && distance < 500.0) {
+      status = 'NOT_RATED';
+      statusReason = 'Distance ' + distance + ' km is under 500 km 28-day window threshold.';
+    }
+
+    // New Scorer calculation
+    let newCounted = 0;
+    if (decel >= newThresh) {
+      newCounted = events;
+    }
+    document.getElementById('lblNewCounted').innerText = newCounted;
+
+    let newH = (newCounted / distance) * 100.0;
+    let newB = Math.min(50.0, 5.0 * newH);
+    let newS = Math.min(35.0, 3.5 * speed);
+    let newI = Math.min(15.0, 1.5 * idle);
+    let newScore = Math.max(0.0, 100.0 - (newB + newS + newI)).toFixed(1);
+
+    document.getElementById('penNewB').innerText = newB.toFixed(1);
+    document.getElementById('penNewS').innerText = newS.toFixed(1);
+    document.getElementById('penNewI').innerText = newI.toFixed(1);
+
+    const valNew = document.getElementById('valNewScore');
+    const badgeNew = document.getElementById('badgeNewStatus');
+    const expNew = document.getElementById('expNewText');
+
+    if (status === 'WITHHELD') {
+      valNew.innerText = 'N/A';
+      badgeNew.className = 'score-badge badge-warning';
+      badgeNew.innerText = 'SCORE WITHHELD';
+      expNew.innerText = statusReason;
+    } else if (status === 'NOT_RATED') {
+      valNew.innerText = 'N/A';
+      badgeNew.className = 'score-badge badge-info';
+      badgeNew.innerText = 'NOT RATED (<500km)';
+      expNew.innerText = statusReason;
+    } else {
+      valNew.innerText = newScore;
+      badgeNew.className = 'score-badge badge-success';
+      badgeNew.innerText = 'RATED · FAIR';
+      if (newCounted === 0 && events > 0) {
+        expNew.innerText = 'Safe descent braking (' + decel.toFixed(1) + ' m/s²) is under terrain band threshold (' + newThresh.toFixed(1) + ' m/s²). Full 0.0 penalty relief granted!';
+      } else if (newCounted > 0) {
+        expNew.innerText = 'Deceleration ' + decel.toFixed(1) + ' m/s² exceeded terrain threshold ' + newThresh.toFixed(1) + ' m/s². Genuinely harsh events appropriately penalized.';
+      } else {
+        expNew.innerText = 'Clean route with zero harsh events. Score 100.0.';
+      }
+    }
+
+    // Legacy Scorer calculation (flat 3.0 m/s2)
+    let legCounted = 0;
+    if (decel >= 3.0) {
+      legCounted = events;
+    }
+    document.getElementById('lblLegacyCounted').innerText = legCounted;
+
+    let legH = (legCounted / distance) * 100.0;
+    let legB = Math.min(50.0, 5.0 * legH);
+    let legS = Math.min(35.0, 3.5 * speed);
+    let legI = Math.min(15.0, 1.5 * idle);
+    let legScore = Math.max(0.0, 100.0 - (legB + legS + legI)).toFixed(1);
+
+    document.getElementById('penLegB').innerText = legB.toFixed(1);
+    document.getElementById('penLegS').innerText = legS.toFixed(1);
+    document.getElementById('penLegI').innerText = legI.toFixed(1);
+
+    const valLeg = document.getElementById('valLegacyScore');
+    const badgeLeg = document.getElementById('badgeLegacyStatus');
+    const expLeg = document.getElementById('expLegText');
+
+    if (status === 'WITHHELD' || status === 'NOT_RATED') {
+      valLeg.innerText = 'N/A';
+      badgeLeg.className = 'score-badge badge-warning';
+      badgeLeg.innerText = status;
+      expLeg.innerText = 'Legacy vendor had no gradient awareness or withholding safeguards.';
+    } else {
+      valLeg.innerText = legScore;
+      let scoreDiff = (parseFloat(newScore) - parseFloat(legScore)).toFixed(1);
+      if (scoreDiff > 2.0) {
+        badgeLeg.className = 'score-badge badge-danger';
+        badgeLeg.innerText = 'UNJUST PENALTY (-' + scoreDiff + ' pts)';
+        expLeg.innerText = 'Vendor failure: Flat 3.0 m/s² threshold penalizes safe descent control, slashing driver score from ' + newScore + ' to ' + legScore + '!';
+      } else {
+        badgeLeg.className = 'score-badge badge-info';
+        badgeLeg.innerText = 'MATCHES (DIFF ' + scoreDiff + ')';
+        expLeg.innerText = 'On flat ground or genuinely harsh braking, both algorithms give identical scores.';
+      }
+    }
+  }
+
+  function applyPreset(presetId) {
+    if (presetId === 'ST-01') {
+      document.getElementById('selGradeBand').value = '1';
+      document.getElementById('rngDecel').value = '2.5';
+      document.getElementById('rngEvents').value = '0';
+      document.getElementById('rngDistance').value = '100';
+      document.getElementById('rngUnknown').value = '0';
+      document.getElementById('chkWindow').checked = false;
+    } else if (presetId === 'ST-04') {
+      document.getElementById('selGradeBand').value = '3.5';
+      document.getElementById('rngDecel').value = '3.2';
+      document.getElementById('rngEvents').value = '5';
+      document.getElementById('rngDistance').value = '100';
+      document.getElementById('rngUnknown').value = '0';
+      document.getElementById('chkWindow').checked = false;
+    } else if (presetId === 'ST-05') {
+      document.getElementById('selGradeBand').value = '6.5';
+      document.getElementById('rngDecel').value = '3.5';
+      document.getElementById('rngEvents').value = '8';
+      document.getElementById('rngDistance').value = '100';
+      document.getElementById('rngUnknown').value = '0';
+      document.getElementById('chkWindow').checked = false;
+    } else if (presetId === 'ST-06') {
+      document.getElementById('selGradeBand').value = '9.0';
+      document.getElementById('rngDecel').value = '3.5';
+      document.getElementById('rngEvents').value = '11';
+      document.getElementById('rngDistance').value = '60';
+      document.getElementById('rngUnknown').value = '0';
+      document.getElementById('chkWindow').checked = false;
+    } else if (presetId === 'ST-07') {
+      document.getElementById('selGradeBand').value = '9.0';
+      document.getElementById('rngDecel').value = '4.6';
+      document.getElementById('rngEvents').value = '2';
+      document.getElementById('rngDistance').value = '50';
+      document.getElementById('rngUnknown').value = '0';
+      document.getElementById('chkWindow').checked = false;
+    } else if (presetId === 'ST-12') {
+      document.getElementById('selGradeBand').value = '1';
+      document.getElementById('rngDistance').value = '300';
+      document.getElementById('chkWindow').checked = true;
+      document.getElementById('rngUnknown').value = '0';
+    } else if (presetId === 'ST-13') {
+      document.getElementById('selGradeBand').value = '1';
+      document.getElementById('rngDistance').value = '100';
+      document.getElementById('rngUnknown').value = '8';
+      document.getElementById('chkWindow').checked = false;
+    }
+    updateScoring();
+  }
+
+  // -------------------------------------------------------------------------
+  // Tab 2: Route Deviation Simulation
+  // -------------------------------------------------------------------------
+  let simDistance = 0;
+  let simCount = 0;
+  let simTicks = 0;
+  let simStatus = 'ON_ROUTE';
+
+  function onSimSliderChange() {
+    simDistance = parseInt(document.getElementById('rngSimDist').value);
+    document.getElementById('lblSimDist').innerText = simDistance + ' m ' + (simDistance <= 500 ? '(Inside Corridor)' : '(Outside Corridor)');
+    drawCanvas();
+  }
+
+  function setSimDistance(val) {
+    document.getElementById('rngSimDist').value = val;
+    onSimSliderChange();
+  }
+
+  function simulateStep() {
+    simTicks++;
+    const isDepot = document.getElementById('chkDepot').checked;
+    const isStop = document.getElementById('chkStop').checked;
+    const isClosure = document.getElementById('chkRoadClosure').checked;
+    const isReroute = document.getElementById('chkReroute').checked;
+    const isHdop = document.getElementById('chkHdop').checked;
+
+    let reason = null;
+
+    if (isHdop) {
+      logSim('HOLD', 'Low GPS quality (HDOP > 5.0); holding state, no counting.');
+      return;
+    }
+
+    if (simDistance <= 500) {
+      simCount = 0;
+      if (simStatus === 'NOTICE' || simStatus === 'ALERT') {
+        simStatus = 'CLEARED';
+        logSim('CLEARED', 'Truck returned to corridor (' + simDistance + 'm); deviation auto-cleared.');
+      } else {
+        simStatus = 'ON_ROUTE';
+        logSim('ON_ROUTE', 'Truck on route (' + simDistance + 'm <= 500m safe buffer).');
+      }
+    } else {
+      // Outside
+      if (isDepot) reason = 'DEPOT_GEOFENCE';
+      else if (isStop) reason = 'PLANNED_STOP';
+      else if (isClosure) reason = 'ROAD_CLOSURE';
+      else if (isReroute) reason = 'DISPATCHER_REROUTE';
+
+      if (reason) {
+        logSim('ON_ROUTE', 'Suppressed: ' + reason + '; deviation tick not counted.');
+      } else {
+        simCount++;
+        if (simCount < 3) {
+          logSim('ON_ROUTE', 'Off corridor (' + simDistance + 'm); tick ' + simCount + '/3 (requires 90s).');
+        } else {
+          if (simTicks >= 20 || simDistance >= 2000) {
+            simStatus = 'ALERT';
+            logSim('ALERT', 'ESCALATED TO ALERT: distance ' + simDistance + 'm or duration >= 10m.');
+          } else {
+            simStatus = 'NOTICE';
+            logSim('NOTICE', 'NOTICE RAISED: 3 consecutive off-corridor reports (90s).');
+          }
+        }
+      }
+    }
+
+    updateSimUI();
+    drawCanvas();
+  }
+
+  function resetDeviationSim() {
+    simDistance = 0;
+    simCount = 0;
+    simTicks = 0;
+    simStatus = 'ON_ROUTE';
+    document.getElementById('rngSimDist').value = 0;
+    onSimSliderChange();
+    updateSimUI();
+    logSim('ON_ROUTE', 'Reset simulation. Truck on planned center line.');
+  }
+
+  function updateSimState() {
+    drawCanvas();
+  }
+
+  function updateSimUI() {
+    document.getElementById('lblSimCount').innerText = simCount + ' / 3';
+    const statusEl = document.getElementById('lblSimStatus');
+    const descEl = document.getElementById('lblSimStatusDesc');
+
+    statusEl.innerText = simStatus;
+    if (simStatus === 'ALERT') {
+      statusEl.style.color = 'var(--rose)';
+      descEl.innerText = 'Escalated alert! Dispatcher notified.';
+    } else if (simStatus === 'NOTICE') {
+      statusEl.style.color = 'var(--amber)';
+      descEl.innerText = 'Notice active (3 consecutive off-corridor ticks).';
+    } else if (simStatus === 'CLEARED') {
+      statusEl.style.color = 'var(--cyan)';
+      descEl.innerText = 'Deviation cleared automatically on corridor return.';
+    } else {
+      statusEl.style.color = 'var(--emerald)';
+      descEl.innerText = 'Truck within safe 500m buffer or exempt.';
+    }
+  }
+
+  function logSim(status, msg) {
+    const log = document.getElementById('simLog');
+    const timeStr = new Date().toTimeString().split(' ')[0];
+    const item = document.createElement('div');
+    item.className = 'log-entry';
+    item.innerHTML = '<span class="log-ts">' + timeStr + '</span><span class="log-status ' + status + '">' + status + '</span><span class="log-msg">' + msg + '</span>';
+    log.prepend(item);
+  }
+
+  function drawCanvas() {
+    const canvas = document.getElementById('corridorCanvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const w = canvas.width;
+    const h = canvas.height;
+
+    ctx.clearRect(0, 0, w, h);
+
+    // Grid lines
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+    ctx.lineWidth = 1;
+    for (let x = 0; x < w; x += 40) {
+      ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke();
+    }
+    for (let y = 0; y < h; y += 40) {
+      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke();
+    }
+
+    const centerY = h / 2;
+
+    // 500m Corridor Buffer (Green Area)
+    const bufferHeight = 80;
+    ctx.fillStyle = 'rgba(16, 185, 129, 0.12)';
+    ctx.fillRect(0, centerY - (bufferHeight / 2), w, bufferHeight);
+    ctx.strokeStyle = 'rgba(16, 185, 129, 0.35)';
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(0, centerY - (bufferHeight / 2), w, bufferHeight);
+
+    // Planned Route Center Line (Cyan)
+    ctx.strokeStyle = '#38bdf8';
+    ctx.lineWidth = 2.5;
+    ctx.setLineDash([8, 6]);
+    ctx.beginPath();
+    ctx.moveTo(0, centerY);
+    ctx.lineTo(w, centerY);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Calculate Truck Y Position based on distance
+    // 500m corresponds to 40px offset from center
+    const pxOffset = (simDistance / 500.0) * (bufferHeight / 2);
+    const truckY = centerY - pxOffset;
+    const truckX = w / 2;
+
+    // Truck indicator
+    ctx.fillStyle = simDistance > 500 ? '#f43f5e' : '#10b981';
+    ctx.shadowColor = simDistance > 500 ? 'rgba(244, 63, 94, 0.6)' : 'rgba(16, 185, 129, 0.6)';
+    ctx.shadowBlur = 12;
+    ctx.beginPath();
+    ctx.arc(truckX, truckY, 9, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.shadowBlur = 0;
+
+    // Label
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '600 11px Inter, sans-serif';
+    ctx.fillText('Truck #1042 (' + simDistance + 'm)', truckX + 14, truckY + 4);
+  }
+
+  // -------------------------------------------------------------------------
+  // Tab 3: Policy Evaluation Logic
+  // -------------------------------------------------------------------------
+  function onRoleChanged() {
+    evaluatePolicy();
+  }
+
+  function setPolicyScenario(role, action) {
+    document.getElementById('selRole').value = role;
+    document.getElementById('selAction').value = action;
+    evaluatePolicy();
+  }
+
+  function evaluatePolicy() {
+    const role = document.getElementById('selRole').value;
+    const action = document.getElementById('selAction').value;
+
+    const badge = document.getElementById('policyStatusBadge');
+    const title = document.getElementById('policyVerdictTitle');
+    const desc = document.getElementById('policyVerdictDesc');
+
+    let status = 'ALLOWED';
+    let badgeClass = 'badge-success';
+    let titleText = 'Authorization Granted';
+    let descText = 'Access approved in accordance with HaulTrack Data Governance guidelines.';
+
+    if (action === 'disciplinary_export') {
+      status = 'DENIED';
+      badgeClass = 'badge-danger';
+      titleText = 'Disciplinary Score Export Strictly Prohibited';
+      descText = 'DUP Clause 1: Driver safety scores are advisory coaching instruments. Exporting scores for disciplinary dismissal is blocked and logged.';
+    } else if (action === 'individual_insurer') {
+      status = 'REJECTED';
+      badgeClass = 'badge-danger';
+      titleText = 'Insurer Individual Driver Lookup Rejected';
+      descText = 'DUP Clause 2: Insurer access is restricted strictly to fleet-level pseudonymized aggregates. Individual identification is prohibited.';
+    } else if (action === 'hr_evidence') {
+      status = 'BARRED';
+      badgeClass = 'badge-danger';
+      titleText = 'HR Panel Barred from Using Individual Scores';
+      descText = 'DUP Clause 3: The HR panel is legally barred from introducing individual safety scores as evidentiary material in employment hearings.';
+    } else if (action === 'appeal_export') {
+      status = 'BLOCKED';
+      badgeClass = 'badge-warning';
+      titleText = 'Score Under Formal Review (Frozen)';
+      descText = 'DUP Clause 6: While an active appeal is unresolved, the contested score is locked in status "under review" and external export is blocked.';
+    } else if (action === 'driver_self_view') {
+      status = 'ALLOWED';
+      badgeClass = 'badge-success';
+      titleText = 'Driver Self-View Approved (Full Transparency)';
+      descText = 'DUP Clause 5: Drivers possess full visibility into their own score, including event counts, downhill gradient bands, and threshold justifications.';
+    } else if (action === 'safety_coaching') {
+      status = 'ALLOWED';
+      badgeClass = 'badge-info';
+      titleText = 'Manager Coaching Access Approved';
+      descText = 'Permitted for constructive safety mentoring and peer coaching discussions.';
+    } else if (action === 'aggregate_insurer') {
+      status = 'ALLOWED';
+      badgeClass = 'badge-info';
+      titleText = 'Insurer Fleet Aggregates Approved';
+      descText = 'Permitted to verify fleet-wide harsh braking reduction for insurance premium rebates.';
+    }
+
+    badge.className = 'score-badge ' + badgeClass;
+    badge.innerText = status;
+    title.innerText = titleText;
+    title.style.color = status === 'ALLOWED' ? 'var(--emerald)' : (status === 'BLOCKED' ? 'var(--amber)' : 'var(--rose)');
+    desc.innerText = descText;
+
+    // Append to audit log
+    const log = document.getElementById('policyAuditLog');
+    const timeStr = new Date().toTimeString().split(' ')[0];
+    const item = document.createElement('div');
+    item.className = 'log-entry';
+    item.innerHTML = '<span class="log-ts">' + timeStr + '</span><span class="log-status ' + (status === 'ALLOWED' ? 'ON_ROUTE' : 'ALERT') + '">' + status + '</span><span class="log-msg">Role \'' + role + '\' &rarr; ' + action + ' (' + titleText + ')</span>';
+    log.prepend(item);
+  }
+
+  // Initial load
+  window.onload = function() {
+    updateScoring();
+    drawCanvas();
+    evaluatePolicy();
+  };
+</script>
+
+</body>
+</html>
